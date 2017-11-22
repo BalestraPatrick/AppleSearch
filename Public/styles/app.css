@@ -1,0 +1,27 @@
+body, html {
+	height: 100%;
+}
+
+body {
+	font-family: sans-serif;
+}
+
+div.welcome {
+	height: 100%;
+	text-align: center;
+}
+
+div.welcome img {
+	position: relative;
+  	top: 50%;
+  	transform: translateY(-50%);
+	width: 300px;
+}
+
+.vertical-center {
+	margin-top: -10%;
+	min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+	min-height: 100vh; /* These two lines are counted as one :-)       */
+	display: flex;
+	align-items: center;
+  }

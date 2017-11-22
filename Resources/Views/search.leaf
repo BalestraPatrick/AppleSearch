@@ -1,0 +1,72 @@
+#extend("base")
+
+#export("title") { Results for "Miao" }
+
+#export("content") {
+	<section>
+		<div class="container">
+			<div class="spacing" style="height: 100px;"></div>
+			<div class="row justify-content-md-center">
+
+				<div class="col col-md-auto" style="text-align: center;">
+					<h4>🍏 🔍</h4>
+					<h4 class="align-bottom">Apple Search <span class="badge badge-secondary align-top" style="font-size:15px;">Beta</span></h4>
+				</div>
+
+				<div class="col-md-auto">
+					<div style="margin-top:25px;">
+						<div class="input-group">
+						<input type="text" class="form-control" placeholder="Search for..." aria-label="Search for...">
+						<span class="input-group-btn">
+							<button class="btn btn-secondary" type="button">🔍</button>
+						</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-auto">
+					<div class="btn-group" style="margin-top:25px;">
+						<button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Language
+						</button>
+						<div class="dropdown-menu dropdown-menu-right">
+							<button class="dropdown-item" type="button">All 🌍</button>
+							<button class="dropdown-item" type="button">English 🇺🇸</button>
+							<button class="dropdown-item" type="button">French 🇫🇷</button>
+							<button class="dropdown-item" type="button">German 🇩🇪</button>
+							<button class="dropdown-item" type="button">Italian 🇮🇹</button>
+						</div>
+					</div>	
+				</div>
+				
+			</div>
+		</div>
+		<div class="container">
+			<div class="col col-lg-3">
+			
+		</div>
+		</section>
+		<section>
+			<div class="container">
+				<div class="spacing" style="height: 100px;"></div>
+				<div class="cards">
+					<div class="card">
+						<div class="card-header">
+							10 results 
+						</div>
+						<!-- BEGIN LOOP -->
+						<div class="card-body">
+							<h4 class="card-title">Card title</h4>
+							<h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+							<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+							<a href="#" class="card-link">Card link</a>
+							<a href="#" class="card-link">Another link</a>
+							<hr>
+						</div>
+						<!-- END LOOP -->
+					</div>
+				</div>
+			</div>
+		</section>
+}
+
