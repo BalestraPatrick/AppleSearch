@@ -11,25 +11,24 @@
 			</div>
 			<div class="row justify-content-md-center">
 				<div class="col-lg-3">
-					<div class="input-group">
-					<input type="text" class="form-control" placeholder="Search for..." aria-label="Search for...">
-					<span class="input-group-btn">
-						<button class="btn btn-secondary" type="button">🔍</button>
-					</span>
-					</div>
+					<form action="/search" method="GET" id="search-form">
+						<div class="input-group">					
+							<input type="text" class="form-control" placeholder="Search for..." aria-label="Search for..." name="query">
+							<span class="input-group-btn">
+								<button class="btn btn-secondary" type="submit" value="Submit">🔍</button>
+							</span>
+						</div>
+					</form>
 				</div>
 				<div class="col-lg-1">
 					<div class="btn-group">
-						<button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							Language
-						</button>
-						<div class="dropdown-menu dropdown-menu-right">
-							<button class="dropdown-item" type="button">All 🌍</button>
-							<button class="dropdown-item" type="button">English 🇺🇸</button>
-							<button class="dropdown-item" type="button">French 🇫🇷</button>
-							<button class="dropdown-item" type="button">German 🇩🇪</button>
-							<button class="dropdown-item" type="button">Italian 🇮🇹</button>
-						</div>
+						<select class="form-control form-control-sm" style="width: 125px" form="search-form" name="lang">
+  							<option>🌍 All</option>
+							<option>🇺🇸 English</option>
+							<option>🇫🇷 French</option>
+							<option>🇩🇪 German</option>
+							<option>🇮🇹 Italian</option>
+						</select>
 					</div>	
 				</div>
 			</div>

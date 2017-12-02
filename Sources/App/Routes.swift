@@ -4,8 +4,8 @@ final class Routes: RouteCollection {
 
     let searchController: SearchController
 
-    init(_ view: ViewRenderer) {
-        self.searchController = SearchController(view)
+    init(droplet: Droplet, view: ViewRenderer) {
+        self.searchController = SearchController(droplet: droplet, view: view)
     }
 
     func build(_ builder: RouteBuilder) throws {
