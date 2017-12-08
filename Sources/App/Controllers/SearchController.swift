@@ -13,9 +13,7 @@ final class SearchController {
 
     /// GET /
     func index(_ req: Request) throws -> ResponseRepresentable {
-        return try view.make("home", [
-            "name": "World"
-        ], for: req)
+        return try view.make("home", for: req)
     }
 
     /// GET /search
@@ -23,24 +21,33 @@ final class SearchController {
         guard let query = req.query else { throw Abort(.badRequest, reason: "Missing query parameter") }
         guard let queryText = query["query"]?.string else { throw Abort(.badRequest, reason: "`query` parameter is in the wrong format or absent") }
         guard let language = query["lang"]?.string else { throw Abort(.badRequest, reason: "`lang` parameter is in the wrong format or absent") }
+        let start = query["start"]?.int ?? 0
 
-        print(language)
         // Load results.
-        let results = try loadResults(term: queryText, language: language)
+        let results = try loadResults(term: queryText, language: language, start: start)
 
         // Load disambiguations.
         let disambiguations = try loadDisambiguations(term: queryText)
 
+        // Load pages number.
+        let pages = try loadPages(term: queryText, language: language, count: results.count)
+
         return try view.make("search", [
-            "disambiguation": disambiguations != nil,
+            "query": queryText,
+            "language": language,
+            "disambiguation": (disambiguations.array?.count ?? 0) != 0,
             "disambiguations": disambiguations,
             "resultsCount": results.count,
-            "results": results.items
-        ], for: req)
+            "resultsPage": start + 1,
+            "results": results.items,
+            "pages": pages,
+        ] as [String: NodeRepresentable], for: req)
     }
+}
+
+extension SearchController {
 
     private func loadResults(term: String, language: String, start: Int = 0) throws -> SearchResults {
-        // TODO: migrate to URLComponents
         let url = buildQuery(term: term, start: start, language: language)
         let response = try droplet.client.get(url)
         guard let json = try? JSON(bytes: response.body.bytes!) else { throw Abort(.internalServerError, reason: "Could not convert response from Solr to JSON") }
@@ -55,6 +62,7 @@ final class SearchController {
             return [
                 "title": title,
                 "url": url,
+                "urlEncoded": url.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!,
                 "lang": lang
             ]
         }
@@ -63,8 +71,7 @@ final class SearchController {
         return SearchResults(count: totalCount, items: printableResults)
     }
 
-    private func loadDisambiguations(term: String) throws -> Node? {
-        // TODO: migrate to URLComponents
+    private func loadDisambiguations(term: String) throws -> Node {
         let response = try droplet.client.get("https://api.duckduckgo.com/?q=\(term)&format=json&pretty=1")
         guard let json = try? JSON(bytes: response.body.bytes!) else { return nil }
         guard let relatedTopics = json["RelatedTopics"]?.array else { return nil }
@@ -75,10 +82,19 @@ final class SearchController {
             guard let startDescription = result[endTitle...].index(of: ">") else { continue }
             let resultTitle = result[result.index(after: startTitle)..<endTitle]
             let resultDescription = result[result.index(after: startDescription)...]
-            let disambiguation = Disambiguation(title: String(resultTitle), description: String(resultDescription))
+            let disambiguation = DisambiguationResult(title: String(resultTitle), description: String(resultDescription))
             disambiguations.append(try! disambiguation.makeNode(in: nil))
         }
         return try disambiguations.makeNode(in: nil)
+    }
+
+    private func loadPages(term: String, language: String, count: Int) throws -> Node {
+        var nodes = [Node]()
+        for i in stride(from: 0, to: count, by: 10) {
+            let pageUrl = "http://0.0.0.0:8080/search?query=\(term.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!)&lang=\(language.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!)&start=\(i / 10)"
+            nodes.append(["link": pageUrl.makeNode(in: nil), "number": String(describing: (i / 10) + 1).makeNode(in: nil)])
+        }
+        return try nodes.makeNode(in: nil)
     }
 
     private func language(for url: String) -> String {
@@ -96,85 +112,5 @@ final class SearchController {
             url = "http://localhost:8983/solr/nutch/select?q=\(encodedQuery)&fq=fq%3D(url%3A%22%5Ehttps%3A%2F%2F\(language.id)%22)&start=\(start)&wt=json&indent=true"
         }
         return url
-    }
-}
-
-enum Language {
-    case english
-    case italian
-    case german
-    case french
-    case all
-
-    init(id: String) {
-        switch id {
-        case "en": self = .english
-        case "it": self = .italian
-        case "de": self = .german
-        case "fr": self = .french
-        case "all": self = .all
-        default: fatalError()
-        }
-    }
-
-    init(name: String) {
-        switch name {
-        case "🇺🇸 English": self = .english
-        case "🇮🇹 Italian": self = .italian
-        case "🇩🇪 German": self = .german
-        case "🇫🇷 French": self = .french
-        case "🌍 All": self = .all
-        default: fatalError()
-        }
-    }
-
-    var id: String {
-        switch self {
-        case .english: return "en"
-        case .italian: return "it"
-        case .german: return "de"
-        case .french: return "fr"
-        case .all: return "all"
-        }
-    }
-
-    var name: String {
-        switch self {
-        case .english: return "🇺🇸 English"
-        case .italian: return "🇮🇹 Italian"
-        case .german: return "🇩🇪 German"
-        case .french: return "🇫🇷 French"
-        case .all: return "🌍 All"
-        }
-    }
-}
-
-struct SearchResults {
-    let count: Int
-    let items: Node
-}
-
-struct Disambiguation: NodeRepresentable {
-
-    let title: String
-    let description: String
-    let imageLink: String?
-
-    init(title: String, description: String, imageLink: String? = nil) {
-        self.title = title
-        self.description = description
-        self.imageLink = imageLink
-    }
-
-    func makeNode(in context: Context?) throws -> Node {
-        var node = try Node(node: [
-            "title": title,
-            "description": description,
-        ])
-
-        if let image = imageLink {
-            node["imageLink"] = image.makeNode(in: nil)
-        }
-        return node
     }
 }

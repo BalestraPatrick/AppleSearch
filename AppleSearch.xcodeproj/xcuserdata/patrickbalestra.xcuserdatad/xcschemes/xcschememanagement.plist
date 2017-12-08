@@ -62,7 +62,7 @@
 		<key>JSONPackageDescription.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>7</integer>
+			<integer>8</integer>
 		</dict>
 		<key>LeafPackageDescription.xcscheme</key>
 		<dict>
@@ -82,7 +82,7 @@
 		<key>NodePackageDescription.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>8</integer>
+			<integer>7</integer>
 		</dict>
 		<key>RandomPackageDescription.xcscheme</key>
 		<dict>

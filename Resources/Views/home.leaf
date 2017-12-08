@@ -1,18 +1,18 @@
 #extend("base")
 
-#export("title") { Apple Search }
+#export("title") { Tech Search }
 
 #export("content") {
 	<div class="vertical-center">
 		<div class="container" style="text-align: center;">
 			<div style="height: 150px">
-				<h1>🍏 🔍</h1>
-				<h2>Apple Search <span class="badge badge-secondary align-top" style="font-size: 15px;">Beta</span></h2>
+				<h1 style="font-size: 70px;">🦄 🔍</h1>
+				<h2>Tech Search <span class="badge badge-secondary align-top" style="font-size: 15px;">Beta</span></h2>
 			</div>
 			<div class="row justify-content-md-center">
 				<div class="col-lg-3">
 					<form action="/search" method="GET" id="search-form">
-						<div class="input-group">					
+						<div class="input-group">				
 							<input type="text" class="form-control" placeholder="Search for..." aria-label="Search for..." name="query">
 							<span class="input-group-btn">
 								<button class="btn btn-secondary" type="submit" value="Submit">🔍</button>

@@ -5,31 +5,34 @@ import HTTP
 @testable import Vapor
 @testable import App
 
-/// This file shows an example of testing
-/// routes through the Droplet.
-
 class RouteTests: TestCase {
+
     let drop = try! Droplet.testable()
 
-    func testWelcome() throws {
+    func testIndexOk() throws {
         try drop
             .testResponse(to: .get, at: "/")
             .assertStatus(is: .ok)
-            .assertBody(contains: "It works")
+            .assertBody(contains: "Tech Search")
     }
 
-    func testHello() throws {
+    func testSearchBadRequestWhenMissingQuery() throws {
         try drop
-            .testResponse(to: .get, at: "/hello/foo")
-            .assertStatus(is: .ok)
-            .assertBody(contains: "foo")
+            .testResponse(to: .get, at: "/search")
+            .assertStatus(is: .badRequest)
     }
 
-    func testInfo() throws {
+    func testSearchBadRequestWhenMissingLanguage() throws {
         try drop
-            .testResponse(to: .get, at: "info")
+            .testResponse(to: Request.makeTest(method: .get, path: "/search", query: "query=iPad"))
+            .assertStatus(is: .badRequest)
+    }
+
+    func testSearchOk() throws {
+        try drop
+            .testResponse(to: Request.makeTest(method: .get, path: "/search", query: "query=ipad&lang=🌍+All"))
             .assertStatus(is: .ok)
-            .assertBody(contains: "0.0.0.0")
+            .assertBody(contains: "ipad")
     }
 }
 
@@ -40,8 +43,9 @@ extension RouteTests {
     /// to function properly.
     /// See ./Tests/LinuxMain.swift for examples
     static let allTests = [
-        ("testWelcome", testWelcome),
-        ("testHello", testHello),
-        ("testInfo", testInfo),
+        ("testIndexOk", testIndexOk),
+        ("testSearchBadRequestWhenMissingQuery", testSearchBadRequestWhenMissingQuery),
+        ("testSearchBadRequestWhenMissingLanguage", testSearchBadRequestWhenMissingLanguage),
+        ("testSearchOk", testSearchOk),
     ]
 }

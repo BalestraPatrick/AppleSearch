@@ -1,6 +1,6 @@
 #extend("base")
 
-#export("title") { Results for "#raw(search)" }
+#export("title") { Results for "#raw(query)" }
 
 #export("content") {
 	<section>
@@ -9,8 +9,8 @@
 			<div class="row justify-content-md-center">
 				<a href="/" style="text-decoration: none; color: black;">
 					<div class="col col-md-auto" style="text-align: center;">
-						<h4>🍏 🔍</h4>
-						<h4 class="align-bottom">Apple Search <span class="badge badge-secondary align-top" style="font-size:15px;">Beta</span></h4>
+						<h1>🦄 🔍</h1>
+						<h4 class="align-bottom">Tech Search <span class="badge badge-secondary align-top" style="font-size:15px;">Beta</span></h4>
 					</div>
 				</a>
 
@@ -18,7 +18,7 @@
 					<div style="margin-top:25px;">
 						<form action="/search" method="GET" id="search-form">
 							<div class="input-group">
-								<input type="text" class="form-control" placeholder="Search for..." aria-label="Search for..." name="query">
+								<input type="text" value="#(query)" class="form-control" placeholder="Search for..." aria-label="Search for..." name="query">
 								<span class="input-group-btn">
 									<button class="btn btn-secondary" type="submit" value="Submit">🔍</button>
 								</span>
@@ -29,12 +29,12 @@
 
 				<div class="col-md-auto">
 					<div class="btn-group" style="margin-top:25px;">
-						<select class="form-control form-control-sm" style="width: 125px" form="search-form" name="lang">
-  							<option>🌍 All</option>
-							<option>🇺🇸 English</option>
-							<option>🇫🇷 French</option>
-							<option>🇩🇪 German</option>
-							<option>🇮🇹 Italian</option>
+						<select class="form-control form-control-sm" style="width: 125px" form="search-form" name="lang" data-selected="#(language)" id="language-select">
+  							<option value="🌍 All">🌍 All</option>
+							<option value="🇺🇸 English">🇺🇸 English</option>
+							<option value="🇫🇷 French">🇫🇷 French</option>
+							<option value="🇩🇪 German">🇩🇪 German</option>
+							<option value="🇮🇹 Italian">🇮🇹 Italian</option>
 						</select>
 					</div>	
 				</div>
@@ -48,7 +48,7 @@
 				<div class="cards">
 					<div class="card">
 						<div class="card-header">
-							#raw(resultsCount) results 
+							#raw(resultsCount) results - page #raw(resultsPage)
 						</div>
 						#if(disambiguation) {
 							<div class="row col-lg-12">
@@ -64,26 +64,55 @@
 							<hr>
 						}
 						<!-- BEGIN LOOP -->
-						#loop(results, "result") {
-							<div class="card-body">
-								<div class="container">
-									<div class="row">
-										<div class="col col-md-10">
-											<a href="#"><h4 class="card-title">Page Title</h1></a><!--#raw(result.title)</h4-->
-											<a href="#"><h6 class="card-subtitle mb-2 text-muted">wikipedia.org</h6></a>
-										</div>
-										<div class="col-4 col-md-2" style="text-align: right;">
-											<p>#(result.lang)</p>
-											<a href="https://translate.google.com/translate?hl=en&sl=auto&tl=en&u=tio.ch" target="_blank"><p>Translate page</p></a>
+						#if(results) {
+							#loop(results, "result") {
+								<div class="card-body">
+									<div class="container">
+										<div class="row">
+											<div class="col col-md-10">
+												<a href="#(result.url)"><h4 class="card-title">#(result.title)</h1></a><!--#raw(result.title)</h4-->
+												<a href="#(result.url)"><h6 class="card-subtitle mb-2 text-muted">#(result.url)</h6></a>
+											</div>
+											<div class="col-4 col-md-2" style="text-align: right;">
+												<p>#(result.lang)</p>
+												<a href="https://translate.google.com/translate?sl=auto&tl=en&js=y&prev=_t&hl=en&ie=UTF-8&u=#(result.urlEncoded)&edit-text=&act=url" target="_blank"><p>Translate page</p></a>
+											</div>
 										</div>
 									</div>
 								</div>
+							}
+						} ##else() {
+							<div style="text-align:center;">
+								<br>
+								<h1 style="font-size: 100px;">🦄</h1>
+								<h4>Good job, you found the unicorn.</h4>
+								<br>
 							</div>
 						}
+
 						<!-- END LOOP -->
+						<div class="card-footer" style="text-align: center;">
+							#if(pages) {
+								<p>- #loop(pages, "page") {
+									<a href="#(page.link)">#(page.number)</a> -
+								}</p>
+								<hr>
+							}
+							Copyright © 2017 Patrick Balestra. All rights reserved.
+						</div>
 					</div>
 				</div>
 			</div>
+			<br>
 		</section>
+		<script>
+			let option = document.getElementById("language-select");
+			for (child in option.children) {
+				let select = option.children[child];
+				if (select.innerHTML == option.dataset.selected) {
+					option.selectedIndex = child;
+				}
+			}
+		</script>
 }
 
